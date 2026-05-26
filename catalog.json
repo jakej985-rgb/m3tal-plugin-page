@@ -1,0 +1,87 @@
+[
+  {
+    "name": "m3tal",
+    "kind": "Stack",
+    "description": "M3TAL Core dashboard and system services stack",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/stacks/m3tal.yml",
+    "composeUrl": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/stack/m3tal-compose.yml"
+  },
+  {
+    "name": "ai",
+    "kind": "Stack",
+    "description": "Modular AI Addon (Ollama + env profiles)",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/stacks/ai.yml",
+    "composeUrl": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/stack/ai-compose.yml"
+  },
+  {
+    "name": "maintenance",
+    "kind": "Stack",
+    "description": "System maintenance and monitoring tools",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/stacks/maintenance.yml",
+    "composeUrl": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/stack/maintenance-compose.yml"
+  },
+  {
+    "name": "network",
+    "kind": "Stack",
+    "description": "Core network services and reverse proxy setup",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/stacks/network.yml",
+    "composeUrl": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/stack/network-compose.yml"
+  },
+  {
+    "name": "routing",
+    "kind": "Stack",
+    "description": "Traefik reverse proxy and SSL termination",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/stacks/routing.yml",
+    "composeUrl": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/stack/routing-compose.yml"
+  },
+  {
+    "name": "basicauth",
+    "kind": "Middleware",
+    "description": "Basic authentication preset for routes",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/middleware/basicauth.yml"
+  },
+  {
+    "name": "ratelimit",
+    "kind": "Middleware",
+    "description": "Rate limiting configuration for endpoints",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/middleware/ratelimit.yml"
+  },
+  {
+    "name": "security-headers",
+    "kind": "Middleware",
+    "description": "Hardened security headers for HTTP services",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/middleware/security-headers.yml"
+  },
+  {
+    "name": "example-route",
+    "kind": "Route",
+    "description": "Example route plugin — customize for your service",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/routes/example-route.yml"
+  },
+  {
+    "name": "traefik-gateway",
+    "kind": "Traefik",
+    "description": "Unified Traefik configuration with default routing and basic authentication preset",
+    "version": "1.0.0",
+    "author": "M3TAL Team",
+    "url": "https://raw.githubusercontent.com/jakej985-rgb/m3tal-core/main/deploy/plugins/traefik/traefik-gateway.yml"
+  }
+]
