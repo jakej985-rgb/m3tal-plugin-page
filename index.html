@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M3TAL Plugins Directory</title>
+  <meta name="description" content="Discover and install M3TAL plugins, middleware integrations, and configuration stacks.">
+  <link rel="stylesheet" href="/assets/css/m3tal.css">
+  <script src="/assets/js/m3tal.js" defer></script>
+</head>
+<body>
+
+  <!-- Global Header Navbar -->
+  <header id="m3tal-global-header"></header>
+
+  <!-- Content Container -->
+  <main class="m3tal-container">
+    
+    <section class="m3tal-hero" style="padding-bottom: 1rem;">
+      <h1>Plugin Directory</h1>
+      <p>Explore, customize, and extend your system using M3TAL-compatible stacks and ingress routing presets.</p>
+    </section>
+
+    <!-- Search & Filters Panel -->
+    <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; backdrop-filter: blur(12px);">
+      <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 0.5rem;">
+        <label for="plugin-search" style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent-cyan); font-weight: 600;">Search Catalog</label>
+        <input type="text" id="plugin-search" placeholder="Type plugin name, author, or keyword..." style="background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.75rem 1rem; color: #ffffff; width: 100%; outline: none; transition: var(--transition-fast);">
+      </div>
+      <div style="width: 200px; display: flex; flex-direction: column; gap: 0.5rem;">
+        <label for="plugin-filter" style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent-cyan); font-weight: 600;">Kind</label>
+        <select id="plugin-filter" style="background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.75rem 1rem; color: #ffffff; outline: none; cursor: pointer;">
+          <option value="all">All Kinds</option>
+          <option value="stack">Stack</option>
+          <option value="middleware">Middleware</option>
+          <option value="route">Route</option>
+          <option value="traefik">Traefik</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Plugins Grid -->
+    <div id="plugins-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+      <!-- Cards rendered dynamically by JS -->
+    </div>
+
+    <div id="no-results" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+      <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">🔍 No matching plugins found</p>
+      <p style="font-size: 0.95rem;">Try adjusting your keyword filter or switching kinds.</p>
+    </div>
+
+  </main>
+
+  <!-- Global Footer -->
+  <div id="m3tal-global-footer"></div>
+
+  <!-- Dynamic Catalog Loader -->
+  <script>
+    let catalog = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('plugins-grid');
+      const search = document.getElementById('plugin-search');
+      const filter = document.getElementById('plugin-filter');
+      const noResults = document.getElementById('no-results');
+
+      // Style focus ring for search input
+      search.addEventListener('focus', () => {
+        search.style.borderColor = 'var(--accent-cyan)';
+        search.style.boxShadow = 'var(--shadow-glow)';
+      });
+      search.addEventListener('blur', () => {
+        search.style.borderColor = '';
+        search.style.boxShadow = '';
+      });
+
+      // Fetch the catalog database
+      fetch('/m3tal-plugin-page/plugins.json')
+        .then(res => res.json())
+        .then(data => {
+          catalog = data.plugins || [];
+          renderCatalog(catalog);
+        })
+        .catch(err => {
+          console.error('Failed to load plugin database:', err);
+          grid.innerHTML = '<div style="color: #ef4444; border: 1px solid #ef4444; padding: 2rem; border-radius: 12px; grid-column: 1/-1; text-align: center;">Error loading catalog data database.</div>';
+        });
+
+      // Filtering logic
+      function updateFilters() {
+        const query = search.value.toLowerCase().trim();
+        const selectedKind = filter.value.toLowerCase();
+
+        const filtered = catalog.filter(plugin => {
+          const matchQuery = plugin.name.toLowerCase().includes(query) || 
+                             plugin.description.toLowerCase().includes(query) ||
+                             plugin.author.toLowerCase().includes(query);
+          const matchKind = selectedKind === 'all' || plugin.kind.toLowerCase() === selectedKind;
+          return matchQuery && matchKind;
+        });
+
+        renderCatalog(filtered);
+      }
+
+      search.addEventListener('input', updateFilters);
+      filter.addEventListener('change', updateFilters);
+
+      function renderCatalog(items) {
+        grid.innerHTML = '';
+        if (items.length === 0) {
+          noResults.style.display = 'block';
+          grid.style.display = 'none';
+          return;
+        }
+
+        noResults.style.display = 'none';
+        grid.style.display = 'grid';
+
+        items.forEach(plugin => {
+          const card = document.createElement('article');
+          card.className = 'm3tal-card';
+          card.style.display = 'flex';
+          card.style.flexDirection = 'column';
+          card.style.justifyContent = 'space-between';
+          
+          card.innerHTML = `
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                <h2 style="font-size: 1.35rem; font-family: var(--font-display);">${plugin.name}</h2>
+                <span style="font-size: 0.75rem; background: rgba(0,242,254,0.15); border: 1px solid var(--accent-cyan); color: #ffffff; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">${plugin.kind}</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Version ${plugin.version} &bull; By ${plugin.author}</p>
+              <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 1.5rem;">${plugin.description}</p>
+              
+              <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <code style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">${plugin.install}</code>
+                <button class="copy-install-btn" data-cmd="${plugin.install}" style="background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border); color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: var(--transition-fast);">Copy</button>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 1.5rem; align-items: center; border-top: 1px solid var(--panel-border); padding-top: 1rem; margin-top: auto;">
+              <a href="${plugin.docs}" style="font-size: 0.9rem;">Documentation</a>
+              <a href="${plugin.repo}" target="_blank" rel="noopener noreferrer" style="font-size: 0.9rem; color: var(--text-muted);">Repository</a>
+            </div>
+          `;
+          
+          grid.appendChild(card);
+        });
+
+        // Attach listeners for local copy buttons
+        document.querySelectorAll('.copy-install-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const cmd = btn.getAttribute('data-cmd');
+            navigator.clipboard.writeText(cmd).then(() => {
+              btn.textContent = 'Copied!';
+              btn.style.borderColor = 'var(--accent-emerald)';
+              btn.style.color = 'var(--accent-emerald)';
+              setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+              }, 2000);
+            });
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
