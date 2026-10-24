@@ -12,9 +12,8 @@
       "ui_view",
       "websocket_stream"
     ],
-    "status": "available",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "available",
     "apt_command": "sudo apt install -y m3tal-plugin-docker-monitor"
   },
   {
@@ -29,26 +28,24 @@
       "actions",
       "ui_view"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-stacks"
   },
   {
     "name": "ai-engine",
-    "title": "Local AI \u0026 LLM",
+    "title": "Local AI & LLM",
     "process_name": "m3tal-ai",
     "package_name": "m3tal-plugin-ai",
-    "category": "Local AI \u0026 LLM",
+    "category": "Local AI & LLM",
     "description": "Local LLM inference manager (Ollama, vLLM), job queue, and model catalog.",
     "capabilities": [
       "inference_runner",
       "job_queue",
       "ui_view"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-ai"
   },
   {
@@ -63,9 +60,8 @@
       "ui_widget",
       "alerts"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-smart"
   },
   {
@@ -73,15 +69,14 @@
     "title": "Traefik Gateway",
     "process_name": "m3tal-traefik",
     "package_name": "m3tal-plugin-traefik",
-    "category": "Networking \u0026 Proxy",
+    "category": "Networking & Proxy",
     "description": "Traefik v3 reverse proxy, automated Let's Encrypt SSL/TLS certificates, and dynamic routing.",
     "capabilities": [
       "proxy_generator",
       "route_provider"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-traefik"
   },
   {
@@ -95,9 +90,8 @@
       "network_tunnel",
       "status_checker"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-vpn"
   },
   {
@@ -112,9 +106,8 @@
       "ui_view",
       "system_admin"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-samba"
   },
   {
@@ -128,9 +121,8 @@
       "benchmark_runner",
       "ui_view"
     ],
-    "status": "planned",
     "version": "0.1.0",
-    "has_deb": false,
+    "status": "planned",
     "apt_command": "sudo apt install -y m3tal-plugin-bench"
   }
 ]
