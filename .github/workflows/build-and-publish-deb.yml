@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '**/plugin.yaml'
-      - 'scripts/**'
-      - 'Makefile'
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       plugin:
-        description: "Plugin directory to build and publish (leave empty for auto-detect or 'all')"
+        description: "Plugin directory to build and publish (leave empty for smart auto-detect or 'all')"
         required: false
         default: ""
 
@@ -50,36 +50,50 @@ jobs:
           sudo apt-get install -y --no-install-recommends dpkg-dev apt-utils gnupg curl
           python3 -m pip install --upgrade pip pyyaml
 
-      - name: Determine Target Plugins
+      - name: Smart Auto-Bump & Identify Touched Plugins
         id: targets
         run: |
-          PLUGINS=""
           INPUT_PLUGIN="${{ github.event.inputs.plugin }}"
+          BASE_REF="${{ github.event.before }}"
+          [ -z "$BASE_REF" ] || [ "$BASE_REF" = "0000000000000000000000000000000000000000" ] && BASE_REF="HEAD~1"
 
           if [ -n "$INPUT_PLUGIN" ] && [ "$INPUT_PLUGIN" != "all" ]; then
-            PLUGINS="$INPUT_PLUGIN"
+            echo "Direct plugin requested: $INPUT_PLUGIN"
+            ./scripts/smart-bump.py --plugin "$INPUT_PLUGIN" --apply
+            TOUCHED="$INPUT_PLUGIN"
           elif [ "$INPUT_PLUGIN" = "all" ]; then
-            PLUGINS=$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts' -exec test -f '{}/plugin.yaml' ';' -exec basename '{}' ';')
+            echo "Force build all plugins requested"
+            ./scripts/smart-bump.py --apply --force
+            TOUCHED=$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts' -exec test -f '{}/plugin.yaml' ';' -exec basename '{}' ';')
           else
-            # Detect changed plugins from git diff against previous commit
-            CHANGED_DIRS=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | cut -d/ -f1 | sort -u || true)
-            for d in $CHANGED_DIRS; do
-              if [ -f "$d/plugin.yaml" ]; then
-                PLUGINS="$PLUGINS $d"
-              fi
-            done
+            echo "Running smart change detection against base $BASE_REF..."
+            # Auto-bump touched plugins and get list
+            TOUCHED=$(./scripts/smart-bump.py --base "$BASE_REF" --list-touched)
+            if [ -n "$TOUCHED" ]; then
+              ./scripts/smart-bump.py --base "$BASE_REF" --apply
+            fi
           fi
 
-          # Fallback: if empty, find all plugins
-          if [ -z "$PLUGINS" ]; then
-            PLUGINS=$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts' -exec test -f '{}/plugin.yaml' ';' -exec basename '{}' ';' || true)
-          fi
+          if [ -z "$TOUCHED" ]; then
+            echo "ℹ️ No plugins were touched. Nothing to bump, build, or publish."
+            echo "plugins=" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 Touched plugins to build: $TOUCHED"
+            echo "plugins=$TOUCHED" >> $GITHUB_OUTPUT
 
-          echo "Target plugins: $PLUGINS"
-          echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
+            # Auto-commit bumped manifests and changelogs if git working tree has changes
+            if [ -n "$(git status --porcelain)" ]; then
+              git config user.name "m3tal-bot"
+              git config user.email "bot@m3tal.io"
+              git add -A
+              git commit -m "chore(release): auto-bump version and update CHANGELOG for $TOUCHED [skip ci]" || true
+              git push origin main || true
+            fi
+          fi
 
       - name: Build and Package Plugins
         id: package
+        if: steps.targets.outputs.plugins != ''
         run: |
           mkdir -p dist/packages
           MANIFEST_PAYLOADS="[]"

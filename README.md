@@ -52,6 +52,22 @@ Use the `plugin-author` subagent from `m3tal-core`:
 ```
 The agent automatically scaffolds the directory structure, JSON-RPC 2.0 loop, static UI bundle, and embeds `.agents/agents/plugin-maintainer/agent.md`.
 
+### Smart Version Auto-Bumping & Change Detection
+The repository includes a smart change detector that only bumps version and builds plugins that have been modified:
+```bash
+# Check which plugins have been touched without modifying files (dry-run):
+make bump-check
+
+# Auto-bump version in plugin.yaml and update CHANGELOG.md for touched plugins:
+make bump
+
+# Build only plugins that have been modified:
+make build-changed
+
+# Package Debian (.deb) only for modified plugins:
+make package-changed
+```
+
 ### Building Plugins
 ```bash
 # Build a single plugin:

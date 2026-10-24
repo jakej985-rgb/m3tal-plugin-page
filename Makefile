@@ -1,14 +1,50 @@
-.PHONY: help build-all test-all build test package package-all clean
+.PHONY: help build-all test-all build test package package-all bump bump-check build-changed package-changed clean
 
 help:
 	@echo "M3TAL Plugins Monorepo Build Targets:"
+	@echo "  make bump [PLUGIN=<name>]   - Smart auto-bump version and CHANGELOG for touched plugins"
+	@echo "  make bump-check             - Dry-run inspect which plugins are touched/need bump"
 	@echo "  make build PLUGIN=<name>    - Build backend and UI for specified plugin"
+	@echo "  make build-changed          - Build only plugins that have been modified"
 	@echo "  make build-all              - Build all plugins in the repository"
 	@echo "  make test PLUGIN=<name>     - Run tests for specified plugin"
 	@echo "  make test-all               - Run tests across all plugins"
 	@echo "  make package PLUGIN=<name>  - Build Debian package (.deb) for specified plugin"
+	@echo "  make package-changed        - Build Debian packages only for modified plugins"
 	@echo "  make package-all            - Build Debian packages for all plugins"
 	@echo "  make clean                  - Clean build artifacts across all plugins"
+
+BASE_ARG = $(if $(BASE),--base "$(BASE)",)
+
+bump-check:
+	@./scripts/smart-bump.sh $(BASE_ARG)
+
+bump:
+ifdef PLUGIN
+	@./scripts/smart-bump.sh --plugin "$(PLUGIN)" $(BASE_ARG) --apply
+else
+	@./scripts/smart-bump.sh $(BASE_ARG) --apply
+endif
+
+build-changed:
+	@TOUCHED=$$("./scripts/smart-bump.sh" $(BASE_ARG) --list-touched); \
+	if [ -z "$$TOUCHED" ]; then \
+		echo "ℹ️ No plugins have been modified. Nothing to build."; \
+	else \
+		for p in $$TOUCHED; do \
+			$(MAKE) build PLUGIN="$$p"; \
+		done; \
+	fi
+
+package-changed:
+	@TOUCHED=$$("./scripts/smart-bump.sh" $(BASE_ARG) --list-touched); \
+	if [ -z "$$TOUCHED" ]; then \
+		echo "ℹ️ No plugins have been modified. Nothing to package."; \
+	else \
+		for p in $$TOUCHED; do \
+			$(MAKE) package PLUGIN="$$p"; \
+		done; \
+	fi
 
 build:
 ifndef PLUGIN
