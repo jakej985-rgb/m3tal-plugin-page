@@ -1,0 +1,129 @@
+name: Build docker-monitor DEB
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker-monitor/**'
+  workflow_dispatch:
+    inputs:
+      force_bump:
+        description: "Force version bump type (auto, patch, minor, major)"
+        required: false
+        default: "auto"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Packaging Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends dpkg-dev apt-utils gnupg curl
+          python3 -m pip install --upgrade pip pyyaml
+
+      - name: Smart Auto-Bump docker-monitor
+        id: bump
+        run: |
+          FORCE_BUMP="${{ github.event.inputs.force_bump || 'auto' }}"
+          BASE_REF="${{ github.event.before }}"
+          [ -z "$BASE_REF" ] || [ "$BASE_REF" = "0000000000000000000000000000000000000000" ] && BASE_REF="HEAD~1"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual workflow dispatch for docker-monitor..."
+            ./scripts/smart-bump.py --plugin "docker-monitor" --bump-type "$FORCE_BUMP" --apply --force
+          else
+            echo "Checking if docker-monitor was modified since $BASE_REF..."
+            TOUCHED=$(./scripts/smart-bump.py --plugin "docker-monitor" --base "$BASE_REF" --list-touched)
+            if [ -n "$TOUCHED" ]; then
+              ./scripts/smart-bump.py --plugin "docker-monitor" --base "$BASE_REF" --apply
+            else
+              echo "ℹ️ docker-monitor was not modified. Skipping build."
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          # Commit bumped version and changelog if updated
+          if [ -n "$(git status --porcelain docker-monitor/)" ]; then
+            git config user.name "m3tal-bot"
+            git config user.email "bot@m3tal.io"
+            git add docker-monitor/
+            git commit -m "chore(release): auto-bump docker-monitor version and update CHANGELOG [skip ci]" || true
+            git push origin main || true
+          fi
+
+      - name: Build and Package docker-monitor DEB
+        if: steps.bump.outputs.skip != 'true'
+        run: |
+          mkdir -p dist/packages
+          ./scripts/build-plugin-deb.sh docker-monitor
+          mv m3tal-plugin-docker-monitor*.deb dist/packages/ 2>/dev/null || true
+          mv m3tal-plugin-docker-monitor*.sha256 dist/packages/ 2>/dev/null || true
+          ls -la dist/packages/
+
+      - name: Create / Update GitHub Release
+        if: steps.bump.outputs.skip != 'true' && hashFiles('dist/packages/*.deb') != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/packages/*
+          tag_name: plugins-latest
+          name: "M3TAL Plugins Release"
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Ingest & Sign DEB via Central APT Repository (m3tal-apt-key)
+        if: steps.bump.outputs.skip != 'true' && hashFiles('dist/packages/*.deb') != ''
+        run: |
+          for deb in dist/packages/*.deb; do
+            [ -f "$deb" ] || continue
+            DEB_BASENAME=$(basename "$deb")
+            PKG_ID=$(echo "$DEB_BASENAME" | cut -d_ -f1)
+            PKG_VER=$(echo "$DEB_BASENAME" | cut -d_ -f2)
+            DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/plugins-latest/${DEB_BASENAME}"
+
+            echo "🚀 Dispatching $PKG_ID v$PKG_VER to m3tal-apt-key..."
+
+            curl -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+              https://api.github.com/repos/jakej985-rgb/m3tal-apt-key/dispatches \
+              -d @- << EOF
+            {
+              "event_type": "publish-deb",
+              "client_payload": {
+                "package_id": "${PKG_ID}",
+                "version": "${PKG_VER}",
+                "deb_url": "${DOWNLOAD_URL}",
+                "allow_replace": true
+              }
+            }
+          EOF
+          done

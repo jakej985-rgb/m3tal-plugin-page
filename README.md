@@ -36,7 +36,8 @@ m3tal-plugins/
 │   └── build-plugin-deb.sh      # Central Debian packaging script
 ├── .github/
 │   └── workflows/
-│       └── build-and-publish-deb.yml # CI builder & APT repository dispatcher
+│       ├── Build-<plugin>-Deb.yml   # Per-plugin workflow (e.g. Build-docker-monitor-Deb.yml)
+│       └── ...
 └── Makefile                     # Monorepo build orchestrator
 ```
 
@@ -90,8 +91,8 @@ Generates `m3tal-plugin-docker-monitor_<version>_amd64.deb`.
 
 ## 4. Release & APT Ingestion Pipeline
 
-1. When a change or tag is pushed to `<plugin-name>/`, `.github/workflows/build-and-publish-deb.yml` builds the `.deb`.
-2. A GitHub Release is created with the `.deb` asset.
+1. When changes are pushed to `<plugin-name>/`, its dedicated workflow `.github/workflows/Build-<plugin-name>-Deb.yml` triggers.
+2. The workflow auto-bumps the version, updates `CHANGELOG.md`, and builds the `.deb`.
 3. The workflow dispatches a `publish-deb` event to `jakej985-rgb/m3tal-apt-key`:
    ```json
    {
