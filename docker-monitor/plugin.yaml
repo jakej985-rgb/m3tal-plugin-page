@@ -19,7 +19,6 @@ spec:
     - collector
     - actions
     - ui_view
-    - tui_widget
 
   ui:
     entry: "ui/dist/index.html"

@@ -33,13 +33,6 @@ test-ipc: build
 	else \
 		echo "  ✗ Collector (m3tal.collect): FAILED ($$COLLECT_RESP)"; exit 1; \
 	fi
-	@echo "🖥️ Testing text rendering..."
-	@RENDER_RESP=$$(echo '{"jsonrpc":"2.0","id":3,"method":"m3tal.render"}' | ./$(BIN_DIR)/$(BINARY_NAME)); \
-	if echo "$$RENDER_RESP" | grep -q '"format":"plain"'; then \
-		echo "  ✓ Render (m3tal.render): SUCCESS"; \
-	else \
-		echo "  ✗ Render (m3tal.render): FAILED ($$RENDER_RESP)"; exit 1; \
-	fi
 	@echo "⚡ Testing action dispatch..."
 	@ACTION_RESP=$$(echo '{"jsonrpc":"2.0","id":4,"method":"m3tal.action","params":{"action_id":"prune_images"}}' | ./$(BIN_DIR)/$(BINARY_NAME)); \
 	if echo "$$ACTION_RESP" | grep -q '"success":true'; then \

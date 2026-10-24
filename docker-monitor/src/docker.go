@@ -23,8 +23,8 @@ type Container struct {
 }
 
 var (
-	mockMu        sync.Mutex
-	mockEnabled   bool
+	mockMu         sync.Mutex
+	mockEnabled    bool
 	mockContainers = []Container{
 		{ID: "c1a2b3c4d5e6", Name: "m3tal-proxy", Image: "traefik:v3.0", Status: "Up 12 hours", Ports: "80->80/tcp, 443->443/tcp", State: "running", CPU: "0.12%", Memory: "32.4MiB / 16GiB"},
 		{ID: "f7e8d9c0b1a2", Name: "m3tal-ai", Image: "ollama/ollama:latest", Status: "Up 12 hours", Ports: "11434->11434/tcp", State: "running", CPU: "0.05%", Memory: "512MiB / 16GiB"},

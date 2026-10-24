@@ -27,7 +27,6 @@ You are the resident custodian for this plugin directory. Your duty is to implem
 3. **RPC Contract**: Always preserve valid JSON-RPC 2.0 handling over `stdio`:
    - `m3tal.init`: Handshake returning version, capabilities, tabs, and action declarations.
    - `m3tal.collect`: Telemetry metric collector (container counts, states, and ps table).
-   - `m3tal.render`: TUI/terminal formatted view for CLI dashboards.
    - `m3tal.action`: Action dispatcher (start, stop, restart, prune, logs).
    - `m3tal.shutdown`: Graceful cleanup.
 4. **UI Assets**: All static UI assets in `ui/dist/` must use relative links (`./assets/...`) so they render seamlessly when mounted under `/plugins/docker-monitor/`.

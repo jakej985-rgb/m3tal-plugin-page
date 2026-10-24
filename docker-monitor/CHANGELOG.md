@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Changes & Improvements
 - **docs(plugins): require and package CHANGELOG.md for all plugins (added to docker-monitor)** (`361edac`)
+- **refactor(plugins): purge legacy `tui_widget` capability and `m3tal.render` handler**: Align with the zero-TUI / minimal-CLI platform architecture; all presentation is now exclusively handled by dynamic Web GUI micro-frontends (`ui_view`).
 
 ---
 

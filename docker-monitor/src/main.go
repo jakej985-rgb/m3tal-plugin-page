@@ -14,7 +14,7 @@ import (
 const (
 	CanonicalProcessName = "m3tal-docker"
 	PluginName           = "docker-monitor"
-	PluginVersion        = "0.1.0"
+	PluginVersion        = "0.1.1"
 )
 
 // RPCRequest represents standard JSON-RPC 2.0 request.
@@ -82,7 +82,6 @@ func handleRequest(req *RPCRequest) {
 			"capabilities": []string{
 				"collector",
 				"actions",
-				"tui_widget",
 				"ui_view",
 			},
 			"tabs": []map[string]interface{}{
@@ -196,33 +195,6 @@ func handleRequest(req *RPCRequest) {
 			},
 		})
 
-	case "m3tal.render":
-		containers, _ := GetContainers()
-		var b strings.Builder
-		b.WriteString(fmt.Sprintf("🐳 DOCKER FLEET (%d active / %d total)\n", countRunning(containers), len(containers)))
-		b.WriteString(strings.Repeat("─", 80) + "\n")
-		b.WriteString(fmt.Sprintf("%-12s %-20s %-22s %-12s %-8s\n", "ID", "NAME", "IMAGE", "STATE", "CPU"))
-		b.WriteString(strings.Repeat("─", 80) + "\n")
-		for _, c := range containers {
-			idDisp := c.ID
-			if len(idDisp) > 10 {
-				idDisp = idDisp[:10]
-			}
-			nameDisp := c.Name
-			if len(nameDisp) > 18 {
-				nameDisp = nameDisp[:18]
-			}
-			imgDisp := c.Image
-			if len(imgDisp) > 20 {
-				imgDisp = imgDisp[:20]
-			}
-			b.WriteString(fmt.Sprintf("%-12s %-20s %-22s %-12s %-8s\n", idDisp, nameDisp, imgDisp, c.State, c.CPU))
-		}
-		sendResult(req.ID, map[string]interface{}{
-			"format":  "plain",
-			"content": b.String(),
-		})
-
 	case "m3tal.action":
 		var params struct {
 			ActionID string                 `json:"action_id"`
@@ -327,16 +299,6 @@ func handleRequest(req *RPCRequest) {
 	default:
 		sendError(req.ID, -32601, "Method not found: "+req.Method)
 	}
-}
-
-func countRunning(containers []Container) int {
-	c := 0
-	for _, cnt := range containers {
-		if cnt.State == "running" || strings.HasPrefix(strings.ToLower(cnt.Status), "up") {
-			c++
-		}
-	}
-	return c
 }
 
 func sendResult(id interface{}, result interface{}) {

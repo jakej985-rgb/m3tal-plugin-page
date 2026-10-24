@@ -60,7 +60,7 @@ Before pushing to `origin/main`, you MUST execute and pass all validation gates:
     fi
   done
   ```
-- Handshake (`m3tal.init`), collection (`m3tal.collect`), render (`m3tal.render`), actions (`m3tal.action`), and graceful exit (`m3tal.shutdown`) must pass.
+- Handshake (`m3tal.init`), collection (`m3tal.collect`), actions (`m3tal.action`), and graceful exit (`m3tal.shutdown`) must pass.
 
 ### Gate 4: Specification & Changelog Compliance
 For every plugin directory containing `plugin.yaml`:

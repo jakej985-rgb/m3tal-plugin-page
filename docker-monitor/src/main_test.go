@@ -88,19 +88,6 @@ func TestRPCHandlerCollect(t *testing.T) {
 	handleRequest(&req)
 }
 
-func TestRPCHandlerRender(t *testing.T) {
-	SetMockMode(true)
-	defer SetMockMode(false)
-
-	req := RPCRequest{
-		JSONRPC: "2.0",
-		ID:      3,
-		Method:  "m3tal.render",
-	}
-
-	handleRequest(&req)
-}
-
 func TestRPCHandlerAction(t *testing.T) {
 	SetMockMode(true)
 	defer SetMockMode(false)
