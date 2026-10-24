@@ -31,6 +31,7 @@ You are the resident custodian for this plugin directory. Your duty is to implem
    - `m3tal.action`: Action dispatcher (start, stop, restart, prune, logs).
    - `m3tal.shutdown`: Graceful cleanup.
 4. **UI Assets**: All static UI assets in `ui/dist/` must use relative links (`./assets/...`) so they render seamlessly when mounted under `/plugins/docker-monitor/`.
+5. **Changelog**: Maintain `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/) format and SemVer for every feature, fix, and release.
 
 ## Development Commands
 - **Build Backend**: `make build`

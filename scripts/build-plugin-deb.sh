@@ -45,9 +45,11 @@ trap 'rm -rf "$STAGE_DIR"' EXIT
 mkdir -p "$STAGE_DIR/DEBIAN"
 mkdir -p "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN"
 mkdir -p "$STAGE_DIR/etc/m3tal/plugins/$PLUGIN"
+mkdir -p "$STAGE_DIR/usr/share/doc/$PKG_NAME"
 
 # Copy payload
 cp "$PLUGIN_DIR/plugin.yaml" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/"
+[ -f "$PLUGIN_DIR/CHANGELOG.md" ] && cp "$PLUGIN_DIR/CHANGELOG.md" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/" && cp "$PLUGIN_DIR/CHANGELOG.md" "$STAGE_DIR/usr/share/doc/$PKG_NAME/"
 [ -d "$PLUGIN_DIR/bin" ] && cp -r "$PLUGIN_DIR/bin" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/"
 [ -d "$PLUGIN_DIR/ui/dist" ] && mkdir -p "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/ui" && cp -r "$PLUGIN_DIR/ui/dist" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/ui/"
 [ -d "$PLUGIN_DIR/config" ] && cp -r "$PLUGIN_DIR/config" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/"
@@ -55,6 +57,7 @@ cp "$PLUGIN_DIR/plugin.yaml" "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/"
 # Set permissions
 find "$STAGE_DIR" -type d -exec chmod 755 {} +
 find "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN" -type f -exec chmod 644 {} +
+find "$STAGE_DIR/usr/share/doc/$PKG_NAME" -type f -exec chmod 644 {} + 2>/dev/null || true
 [ -d "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/bin" ] && find "$STAGE_DIR/usr/lib/m3tal/plugins/$PLUGIN/bin" -type f -exec chmod 755 {} +
 
 # Generate DEBIAN/control

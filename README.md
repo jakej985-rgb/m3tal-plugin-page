@@ -22,6 +22,7 @@ m3tal-plugins/
 │   │       └── plugin-maintainer/
 │   │           └── agent.md     # In-repo custodian agent for this plugin
 │   ├── plugin.yaml              # Standard manifest (apiVersion: m3tal.io/v1alpha1)
+│   ├── CHANGELOG.md             # Version history following Keep a Changelog
 │   ├── Makefile                 # Plugin-specific build & test targets
 │   ├── bin/                     # Backend binary or executable entrypoint
 │   ├── ui/
