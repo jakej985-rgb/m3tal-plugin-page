@@ -7,7 +7,7 @@ This repository contains all official and community plugins for the **M3TAL Core
 - **Zero Core Footprint**: `m3tal-core` contains zero plugin-specific UI components, API endpoints, or models. It acts solely as the Host Supervisor and Dynamic UI mount point.
 - **Top-Level Plugin Folders**: Every plugin lives in its own top-level directory directly under this repository root (e.g. `docker-monitor/`, `ai-engine/`, `smart-disk/`). There is no intermediate wrapper folder.
 - **Complete Self-Containment**: All backend code, frontend UI assets, manifest (`plugin.yaml`), configuration schema, and build rules live strictly within the plugin's own folder.
-- **Canonical Process Identity**: Every running plugin subprocess identifies as `m3tal-<plugin-name>` (e.g. `m3tal-docker`, `m3tal-ai`).
+- **Canonical Process Identity (`m3tal-<process>`)**: Every running plugin subprocess, collector, and worker MUST identify as `m3tal-<process>` (e.g. `m3tal-docker`, `m3tal-ai`, `m3tal-smart`) so operators and monitoring tools can instantly track high CPU, memory, or disk I/O usage in `top`, `htop`, or `m3tal-sysmon`.
 - **Debian Packaging & Central Signing**: All `.deb` packages (`m3tal-plugin-<name>_<version>_amd64.deb`) are built in this repository and dispatched to `jakej985-rgb/m3tal-apt-key` for official GPG signing and APT repository indexing.
 
 ---
