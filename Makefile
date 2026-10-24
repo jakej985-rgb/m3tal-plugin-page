@@ -1,0 +1,69 @@
+.PHONY: help build-all test-all build test package package-all clean
+
+help:
+	@echo "M3TAL Plugins Monorepo Build Targets:"
+	@echo "  make build PLUGIN=<name>    - Build backend and UI for specified plugin"
+	@echo "  make build-all              - Build all plugins in the repository"
+	@echo "  make test PLUGIN=<name>     - Run tests for specified plugin"
+	@echo "  make test-all               - Run tests across all plugins"
+	@echo "  make package PLUGIN=<name>  - Build Debian package (.deb) for specified plugin"
+	@echo "  make package-all            - Build Debian packages for all plugins"
+	@echo "  make clean                  - Clean build artifacts across all plugins"
+
+build:
+ifndef PLUGIN
+	$(error PLUGIN is not set. Usage: make build PLUGIN=<plugin-name>)
+endif
+	@echo "🔨 Building plugin: $(PLUGIN)..."
+	@if [ -f "$(PLUGIN)/Makefile" ]; then \
+		$(MAKE) -C "$(PLUGIN)" build; \
+	elif [ -f "$(PLUGIN)/plugin.yaml" ]; then \
+		echo "Building standard plugin in $(PLUGIN)..."; \
+		[ -d "$(PLUGIN)/ui" ] && (cd "$(PLUGIN)/ui" && npm run build 2>/dev/null || true); \
+		[ -d "$(PLUGIN)/src" ] && (cd "$(PLUGIN)/src" && go build -o ../bin/$(PLUGIN) . 2>/dev/null || true); \
+	else \
+		echo "Plugin $(PLUGIN) not found or missing plugin.yaml"; exit 1; \
+	fi
+
+build-all:
+	@for p in $$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts'); do \
+		if [ -f "$$p/plugin.yaml" ]; then \
+			$(MAKE) build PLUGIN="$$(basename "$$p")"; \
+		fi; \
+	done
+
+test:
+ifndef PLUGIN
+	$(error PLUGIN is not set. Usage: make test PLUGIN=<plugin-name>)
+endif
+	@if [ -f "$(PLUGIN)/Makefile" ]; then \
+		$(MAKE) -C "$(PLUGIN)" test; \
+	fi
+
+test-all:
+	@for p in $$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts'); do \
+		if [ -f "$$p/plugin.yaml" ]; then \
+			$(MAKE) test PLUGIN="$$(basename "$$p")"; \
+		fi; \
+	done
+
+package:
+ifndef PLUGIN
+	$(error PLUGIN is not set. Usage: make package PLUGIN=<plugin-name>)
+endif
+	@./scripts/build-plugin-deb.sh "$(PLUGIN)"
+
+package-all:
+	@for p in $$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts'); do \
+		if [ -f "$$p/plugin.yaml" ]; then \
+			./scripts/build-plugin-deb.sh "$$(basename "$$p")"; \
+		fi; \
+	done
+
+clean:
+	@rm -f *.deb *.sha256
+	@for p in $$(find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' ! -name 'scripts'); do \
+		if [ -f "$$p/Makefile" ]; then \
+			$(MAKE) -C "$$p" clean 2>/dev/null || true; \
+		fi; \
+	done
