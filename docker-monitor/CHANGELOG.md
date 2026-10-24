@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-10-24
+
+### 🚀 Changes & Improvements
+- **refactor(docker-monitor): purge legacy tui_widget and m3tal.render handler** (`be7e866`)
+
+---
+
 ## [0.1.1] - 2026-10-24
 
 ### 🚀 Changes & Improvements
