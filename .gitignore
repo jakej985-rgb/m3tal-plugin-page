@@ -1,0 +1,15 @@
+# Binaries and build artifacts
+bin/
+*.deb
+*.sha256
+
+# Temporary files and caches
+*.tmp
+*.log
+.cache/
+
+# Node / JS
+node_modules/
+
+# OS specific
+.DS_Store

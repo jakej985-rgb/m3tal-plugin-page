@@ -1,0 +1,39 @@
+apiVersion: m3tal.io/v1alpha1
+kind: Plugin
+metadata:
+  name: docker-monitor
+  version: "0.1.0"
+  title: "Containers"
+  description: "Docker container fleet manager, log inspector, and lifecycle controller"
+  author: "jakej985-rgb"
+  license: "MIT"
+  icon: "IconContainers"
+
+spec:
+  command: "./bin/m3tal-docker"
+  args: []
+  process_name: "m3tal-docker"
+  poll_interval: 2s
+
+  capabilities:
+    - collector
+    - actions
+    - ui_view
+    - tui_widget
+
+  ui:
+    entry: "ui/dist/index.html"
+    route: "/containers"
+    title: "Containers"
+    sidebar: true
+    order: 20
+    roles: ["admin", "viewer"]
+
+  rpc:
+    protocol: "jsonrpc-2.0"
+    transport: "stdio"
+
+  requirements:
+    binaries:
+      - docker
+    root: false
