@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-10-24
+
+### 🚀 Changes & Improvements
+- **docs(plugins): require and package CHANGELOG.md for all plugins (added to docker-monitor)** (`361edac`)
+
+---
+
 ## [0.1.0] - 2026-10-24
 
 ### Overview & Highlights
