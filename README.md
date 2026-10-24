@@ -1,1 +1,1 @@
-# m3tal-plugin-page
+# m3tal-plugins
